@@ -302,19 +302,23 @@ app.use((error, _req, res, _next) => {
   });
 });
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`PHOTO AI API running at http://localhost:${PORT}`);
-});
-
-// Graceful shutdown
-function shutdown() {
-  console.log('Shutting down PHOTO AI API...');
-
-  server.close(() => {
-    process.exit(0);
+// Start local server only outside Vercel
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, () => {
+    console.log(`PHOTO AI API running at http://localhost:${PORT}`);
   });
+
+  function shutdown() {
+    console.log('Shutting down PHOTO AI API...');
+
+    server.close(() => {
+      process.exit(0);
+    });
+  }
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 }
 
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+// Export app for Vercel
+export default app;
