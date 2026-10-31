@@ -7,28 +7,31 @@
   </url>
 
   <url>
-    <loc>https://www.photoai.site/background-remover</loc>
-    <priority>0.8</priority>
+    <loc>https://www.photoai.site/background-remover/</loc>
   </url>
 
   <url>
-    <loc>https://www.photoai.site/ai-photo-enhancer</loc>
-    <priority>0.8</priority>
+    <loc>https://www.photoai.site/ai-photo-enhancer/</loc>
   </url>
 
   <url>
-    <loc>https://www.photoai.site/ai-photo-editor</loc>
-    <priority>0.8</priority>
+    <loc>https://www.photoai.site/ai-photo-editor/</loc>
   </url>
 
   <url>
-    <loc>https://www.photoai.site/image-resizer</loc>
-    <priority>0.8</priority>
+    <loc>https://www.photoai.site/image-resizer/</loc>
   </url>
 
   <url>
-    <loc>https://www.photoai.site/image-compressor</loc>
-    <priority>0.8</priority>
+    <loc>https://www.photoai.site/image-compressor/</loc>
+  </url>
+
+  <url>
+    <loc>https://www.photoai.site/poster-maker/</loc>
+  </url>
+
+  <url>
+    <loc>https://www.photoai.site/advanced-poster/</loc>
   </url>
 
 </urlset>
