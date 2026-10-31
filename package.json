@@ -21,6 +21,7 @@
     "onnxruntime-web": "^1.21.0",
     "react": "latest",
     "react-dom": "latest",
+    "react-router-dom": "^7.18.5",
     "vite": "latest"
   }
 }

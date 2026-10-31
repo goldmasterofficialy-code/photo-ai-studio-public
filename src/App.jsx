@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Aperture, WandSparkles, ImagePlus, Layers3, LayoutTemplate,
   FolderOpen, Settings2, Search, Bell, ChevronDown, Upload,
@@ -70,7 +71,55 @@ export default function App() {
     return 'en';
   }
 });
-  const [active, setActive] = useState('overview');
+  const [active, setActiveState] = useState('overview');
+
+const location = useLocation();
+const navigate = useNavigate();
+
+const routeMap = {
+  '/': 'overview',
+  '/ai-image-generator': 'generate',
+  '/ai-photo-editor': 'edit',
+  '/poster-maker': 'poster',
+  '/advanced-poster': 'advanced-poster',
+  '/projects': 'projects',
+  '/templates': 'templates',
+  '/background-remover': 'remove',
+  '/ai-photo-enhancer': 'enhance',
+  '/image-resizer': 'resize',
+  '/image-compressor': 'compress'
+};
+
+const activeRoutes = {
+  overview: '/',
+  generate: '/ai-image-generator',
+  edit: '/ai-photo-editor',
+  poster: '/poster-maker',
+  'advanced-poster': '/advanced-poster',
+  projects: '/projects',
+  templates: '/templates',
+  remove: '/background-remover',
+  enhance: '/ai-photo-enhancer',
+  resize: '/image-resizer',
+  compress: '/image-compressor'
+};
+
+useEffect(() => {
+ const page = routeMap[location.pathname] || 'overview';
+  setActiveState(page);
+}, [location.pathname]);
+
+function setActive(page) {
+  setActiveState(page);
+
+  const path = activeRoutes[page] || '/';
+
+  if (location.pathname !== path) {
+    navigate(path);
+  }
+
+  setMobileOpen(false);
+}
 
   const [image, setImage] = useState('');
   const [sourceImageData, setSourceImageData] = useState('');
