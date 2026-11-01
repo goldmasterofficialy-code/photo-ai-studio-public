@@ -15,6 +15,7 @@
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
+    "firebase": "^13.1.0",
     "jspdf": "^4.2.1",
     "lucide-react": "latest",
     "multer": "latest",

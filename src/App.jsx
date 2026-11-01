@@ -6,8 +6,11 @@ import {
   Download, Sparkles, SlidersHorizontal, Type, Crop, Eraser,
   ScanFace, Languages, Menu, X, Plus, LockKeyhole, CircleHelp,
   ArrowUpRight, Image as ImageIcon, RotateCcw, Sun, Contrast,
-  Droplets, LoaderCircle, Save, Trash2, ExternalLink, FileImage
+ Droplets, LoaderCircle, Save, Trash2, ExternalLink, FileImage, LogOut
 } from 'lucide-react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './firebase';
+import Auth from './Auth';
 
 import { jsPDF } from 'jspdf';
 import {
@@ -20,6 +23,7 @@ import PhotoEnhancer from './PhotoEnhancer';
 import ResizeCrop from './ResizeCrop';
 import ImageCompressor from './ImageCompressor';
 import AdvancedPosterEditor from './AdvancedPosterEditor';
+import LegalPages from './LegalPages';
 
 const STORAGE_KEY = 'photo-ai-studio-projects-v1';
 
@@ -42,9 +46,9 @@ const templateCards = [
   { name: 'Festival Greeting', tag: 'FESTIVAL', cls: 'template-festival' }
 ];
 
-function readProjects() {
+function readProjects(storageKey) {
   try {
-    const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const value = JSON.parse(localStorage.getItem(storageKey) || '[]');
     return Array.isArray(value) ? value : [];
   } catch {
     return [];
@@ -73,6 +77,8 @@ export default function App() {
 });
   const [active, setActiveState] = useState('overview');
 
+const [user, setUser] = useState(null);
+const [authLoading, setAuthLoading] = useState(true);
 const location = useLocation();
 const navigate = useNavigate();
 
@@ -87,7 +93,11 @@ const routeMap = {
   '/background-remover': 'remove',
   '/ai-photo-enhancer': 'enhance',
   '/image-resizer': 'resize',
-  '/image-compressor': 'compress'
+  '/image-compressor': 'compress',
+'/about': 'about',
+'/contact': 'contact',
+'/privacy-policy': 'privacy',
+'/terms-and-conditions': 'terms'
 };
 
 const activeRoutes = {
@@ -101,13 +111,32 @@ const activeRoutes = {
   remove: '/background-remover',
   enhance: '/ai-photo-enhancer',
   resize: '/image-resizer',
-  compress: '/image-compressor'
+ compress: '/image-compressor',
+about: '/about',
+contact: '/contact',
+privacy: '/privacy-policy',
+terms: '/terms-and-conditions'
 };
 
 useEffect(() => {
  const page = routeMap[location.pathname] || 'overview';
   setActiveState(page);
 }, [location.pathname]);
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(
+    auth,
+    (firebaseUser) => {
+      setUser(firebaseUser);
+      setAuthLoading(false);
+    },
+    (error) => {
+      console.error('Authentication error:', error);
+      setAuthLoading(false);
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
 
 function setActive(page) {
   setActiveState(page);
@@ -144,7 +173,11 @@ function setActive(page) {
   const [subtitleSize, setSubtitleSize] = useState(22);
   const [textColor, setTextColor] = useState('#ffffff');
 
-  const [projects, setProjects] = useState(readProjects);
+  const [projects, setProjects] = useState([]);
+const [projectsLoadedFor, setProjectsLoadedFor] = useState(null);
+const projectsStorageKey = user
+  ? `${STORAGE_KEY}-${user.uid}`
+  : null;
   const [notice, setNotice] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -163,14 +196,36 @@ function setActive(page) {
   document.documentElement.dir = getDirection(lang);
 }, [lang]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-    } catch (error) {
-      console.error(error);
-      setNotice('Storage full. Delete some old projects and try again.');
-    }
-  }, [projects]);
+  // Login user ke projects load karo
+useEffect(() => {
+  if (!user || !projectsStorageKey) {
+    setProjects([]);
+    setProjectsLoadedFor(null);
+    return;
+  }
+
+  const savedProjects = readProjects(projectsStorageKey);
+
+  setProjects(savedProjects);
+  setProjectsLoadedFor(projectsStorageKey);
+}, [user, projectsStorageKey]);
+
+// Sirf current login user ke projects save karo
+useEffect(() => {
+  if (!projectsStorageKey || projectsLoadedFor !== projectsStorageKey) {
+    return;
+  }
+
+  try {
+    localStorage.setItem(
+      projectsStorageKey,
+      JSON.stringify(projects)
+    );
+  } catch (error) {
+    console.error('Project storage error:', error);
+    setNotice('Storage full. Please delete some old projects.');
+  }
+}, [projects, projectsStorageKey, projectsLoadedFor]);
 
   useEffect(() => {
     return () => {
@@ -189,9 +244,24 @@ function setActive(page) {
     remove: t.remove,
     enhance: t.enhance,
     resize: t.resize,
-    compress: t.compress
+    compress: t.compress,
+about: 'About Us',
+contact: 'Contact Us',
+privacy: 'Privacy Policy',
+terms: 'Terms & Conditions'
   }[active] || t.title;
 
+async function handleLogout() {
+  try {
+    await signOut(auth);
+    setNotice('');
+    setActiveState('overview');
+    navigate('/');
+  } catch (error) {
+    console.error('Logout error:', error);
+    setNotice('Logout failed. Please try again.');
+  }
+}
   async function selectImage(file) {
     if (!file) return;
 
@@ -481,7 +551,35 @@ function setActive(page) {
       exportInProgress.current = false;
     }
   }
+if (authLoading) {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: 12
+    }}>
+      <LoaderCircle size={32} />
+      <p>Checking your login...</p>
+    </div>
+  );
+}
 
+const publicPages = [
+  'overview',
+  'about',
+  'contact',
+  'privacy',
+  'terms'
+];
+
+const requiresLogin = !user && !publicPages.includes(active);
+
+if (requiresLogin) {
+  return <Auth onLogin={setUser} />;
+}
   const sidebar = (
     <aside className={`sidebar ${mobileOpen ? 'mobile-visible' : ''}`}>
       <div className="side-brand">
@@ -498,9 +596,12 @@ function setActive(page) {
         { key: 'overview', label: t.nav[0], icon: Layers3 },
         { key: 'generate', label: t.nav[1], icon: WandSparkles },
         { key: 'poster', label: t.nav[2], icon: LayoutTemplate },
-        { key: 'projects', label: t.nav[3], icon: FolderOpen },
+       
+        ...(user ? [
+        { key: 'projects', label: t.nav[3], icon: FolderOpen }
+        ] : []),
         { key: 'templates', label: t.nav[4], icon: ImageIcon }
-      ].map(({ key, label, icon: Icon }) => (
+        ].map(({ key, label, icon: Icon }) => (
         <button
           key={key}
           className={`side-link ${active === key ? 'active' : ''}`}
@@ -548,15 +649,36 @@ function setActive(page) {
           <p>Unlock your full creative potential.</p>
         </div>
 
-        <button className="side-link" onClick={() => setNotice('Settings are coming soon.')}>
+      <button className="side-link" onClick={() => setNotice('Settings page is coming soon.')}>
           <Settings2 size={17} />{t.settings}
         </button>
 
+       {user ? (
         <div className="user-mini">
-          <div className="avatar">C</div>
-          <div><b>{t.account}</b><small>Free workspace</small></div>
-          <ChevronDown size={15} />
+        <div className="avatar">
+        {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
         </div>
+
+       <div style={{ minWidth: 0 }}>
+      <b>{user.displayName || 'User'}</b>
+      <small>{user.email}</small>
+    </div>
+  </div>
+) : (
+  <button
+    className="side-link"
+    onClick={() => setActive('generate')}
+  >
+    Login / Create Account
+  </button>
+)}
+
+{user && (
+  <button className="side-link" onClick={handleLogout}>
+    <LogOut size={17} />
+    Logout
+  </button>
+)}
       </div>
     </aside>
   );
@@ -608,7 +730,11 @@ function setActive(page) {
         </header>
 
         <div className="page-content">
-
+{['about', 'contact', 'privacy', 'terms'].includes(active) && (
+  <LegalPages
+    page={active}
+  />
+)}
           {active === 'overview' && (
             <>
               <section className="welcome-row">
@@ -1076,10 +1202,46 @@ function setActive(page) {
             </div>
           )}
 
-          <footer className="footer">
-            <span>©️ 2026 PHOTO AI STUDIO</span>
-            <span>CREATE WITHOUT LIMITS <Sparkles size={12} /></span>
-          </footer>
+          <footer className="footer professional-footer">
+  <div className="footer-brand">
+    <div className="footer-logo">
+      <Aperture size={22} />
+      <strong>PHOTO<span>AI</span> STUDIO</strong>
+    </div>
+    <p>
+      Create, edit and enhance your photos with simple creative tools.
+    </p>
+  </div>
+
+  <div className="footer-links">
+    <b>Company</b>
+    <button onClick={() => setActive('about')}>About Us</button>
+    <button onClick={() => setActive('contact')}>Contact Us</button>
+  </div>
+
+  <div className="footer-links">
+    <b>Legal</b>
+    <button onClick={() => setActive('privacy')}>Privacy Policy</button>
+    <button onClick={() => setActive('terms')}>Terms & Conditions</button>
+  </div>
+
+  <div className="footer-links">
+    <b>Contact</b>
+    <a href="mailto:m.d.mpsd@gmail.com">m.d.mpsd@gmail.com</a>
+    <a
+      href="https://wa.me/918887516714"
+      target="_blank"
+      rel="noreferrer"
+    >
+      WhatsApp Support
+    </a>
+  </div>
+
+  <div className="footer-bottom">
+    <span>© 2026 PHOTO AI STUDIO. All rights reserved.</span>
+    <span>CREATE WITHOUT LIMITS ✦</span>
+  </div>
+</footer>
         </div>
       </main>
     </div>
