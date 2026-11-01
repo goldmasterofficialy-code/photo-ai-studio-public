@@ -489,3 +489,120 @@ html[dir="rtl"] .topbar-actions {
     grid-column: 1;
   }
 }
+/* PREMIUM DASHBOARD TOOL CARDS */
+
+.premium-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.premium-tool-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.045);
+  cursor: pointer;
+  transition: transform .25s ease, border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.premium-tool-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(151,125,255,0.65);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+}
+
+.premium-tool-art {
+  position: relative;
+  min-height: 145px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(125,100,255,.4), transparent 45%),
+    linear-gradient(135deg, #292c54, #171a31);
+}
+
+.premium-tool-art::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+}
+
+.premium-tool-emoji {
+  font-size: 58px;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.3));
+  transition: transform .25s ease;
+}
+
+.premium-tool-card:hover .premium-tool-emoji {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+.premium-tool-tag {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 6px 9px;
+  border-radius: 20px;
+  color: white;
+  background: rgba(255,255,255,.15);
+}
+
+.premium-tool-icon {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  color: rgba(255,255,255,.55);
+}
+
+.premium-tool-content {
+  padding: 17px;
+}
+
+.premium-tool-content b {
+  display: block;
+  font-size: 16px;
+  color: #fff;
+}
+
+.premium-tool-content p {
+  min-height: 38px;
+  margin: 8px 0 13px;
+  color: #aeb5ce;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.premium-tool-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #b7a5ff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .premium-tool-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .premium-tool-grid {
+    grid-template-columns: 1fr;
+  }
+}

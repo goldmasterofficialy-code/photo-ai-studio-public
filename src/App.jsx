@@ -24,6 +24,7 @@ import ResizeCrop from './ResizeCrop';
 import ImageCompressor from './ImageCompressor';
 import AdvancedPosterEditor from './AdvancedPosterEditor';
 import LegalPages from './LegalPages';
+import Settings from './Settings.jsx';
 
 const STORAGE_KEY = 'photo-ai-studio-projects-v1';
 
@@ -79,6 +80,7 @@ export default function App() {
 
 const [user, setUser] = useState(null);
 const [authLoading, setAuthLoading] = useState(true);
+const [searchQuery, setSearchQuery] = useState('');
 const location = useLocation();
 const navigate = useNavigate();
 
@@ -97,7 +99,8 @@ const routeMap = {
 '/about': 'about',
 '/contact': 'contact',
 '/privacy-policy': 'privacy',
-'/terms-and-conditions': 'terms'
+'/terms-and-conditions': 'terms',
+'/settings': 'settings'
 };
 
 const activeRoutes = {
@@ -115,7 +118,8 @@ const activeRoutes = {
 about: '/about',
 contact: '/contact',
 privacy: '/privacy-policy',
-terms: '/terms-and-conditions'
+terms: '/terms-and-conditions',
+settings: '/settings'
 };
 
 useEffect(() => {
@@ -649,9 +653,15 @@ if (requiresLogin) {
           <p>Unlock your full creative potential.</p>
         </div>
 
-      <button className="side-link" onClick={() => setNotice('Settings page is coming soon.')}>
-          <Settings2 size={17} />{t.settings}
-        </button>
+      <button
+  className="side-link"
+  onClick={() => {
+    navigate('/settings');
+    setMobileOpen(false);
+  }}
+>
+  <Settings2 size={17} /> {t.settings}
+</button>
 
        {user ? (
         <div className="user-mini">
@@ -700,7 +710,77 @@ if (requiresLogin) {
           <div className="topbar-actions">
             <div className="searchbox">
               <Search size={16} />
-              <input placeholder={t.search} />
+              <input
+  type="search"
+  placeholder="Search tools, templates and projects..."
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      const query = e.currentTarget.value.trim().toLowerCase();
+
+      const searchItems = [
+        {
+          name: 'ai image generator image generate',
+          path: '/ai-image-generator'
+        },
+        {
+          name: 'ai photo editor photo edit',
+          path: '/ai-photo-editor'
+        },
+        {
+          name: 'poster maker poster',
+          path: '/poster-maker'
+        },
+        {
+          name: 'advanced poster editor',
+          path: '/advanced-poster'
+        },
+        {
+          name: 'background remover remove background',
+          path: '/background-remover'
+        },
+        {
+          name: 'photo enhancer enhance image',
+          path: '/ai-photo-enhancer'
+        },
+        {
+          name: 'image resizer resize',
+          path: '/image-resizer'
+        },
+        {
+          name: 'image compressor compress',
+          path: '/image-compressor'
+        },
+        {
+          name: 'my projects projects',
+          path: '/projects'
+        },
+        {
+          name: 'templates',
+          path: '/templates'
+        },
+        {
+          name: 'settings',
+          path: '/settings'
+        }
+      ];
+
+      const result = searchItems.find(item =>
+        item.name.includes(query)
+      );
+
+      if (result && query) {
+        navigate(result.path);
+        e.currentTarget.value = '';
+      } else {
+        setNotice(
+          query
+            ? 'No matching tool found. Try another name.'
+            : 'Please enter a tool name.'
+        );
+      }
+    }
+  }}
+/>
               <kbd>⌘ K</kbd>
             </div>
 
@@ -735,6 +815,7 @@ if (requiresLogin) {
     page={active}
   />
 )}
+
           {active === 'overview' && (
             <>
               <section className="welcome-row">
@@ -775,15 +856,74 @@ if (requiresLogin) {
                 <span className="muted-caption">7 CREATIVE TOOLS</span>
               </div>
 
-              <section className="tool-grid">
-                {tools.map(({ key, icon: Icon, tone }) => (
-                  <button className="tool-card" key={key} onClick={() => setActive(key)}>
-                    <div className={`tool-icon ${tone}`}><Icon size={21} /></div>
-                    <div><b>{t[key]}</b><p>Open creative workspace</p></div>
-                    <ArrowUpRight className="tool-arrow" size={16} />
-                  </button>
-                ))}
-              </section>
+              <section className="tool-grid premium-tool-grid">
+  {tools.map(({ key, icon: Icon, tone }) => {
+    const toolDetails = {
+      generate: {
+        emoji: '✨',
+        description: 'Create stunning AI images from your imagination.',
+        tag: 'AI POWERED'
+      },
+      edit: {
+        emoji: '🎨',
+        description: 'Transform and edit your photos creatively.',
+        tag: 'PHOTO EDIT'
+      },
+      poster: {
+        emoji: '🖼️',
+        description: 'Design beautiful posters in minutes.',
+        tag: 'DESIGN'
+      },
+      remove: {
+        emoji: '✂️',
+        description: 'Remove image backgrounds in one click.',
+        tag: 'INSTANT'
+      },
+      enhance: {
+        emoji: '💎',
+        description: 'Improve photo quality and clarity.',
+        tag: 'ENHANCE'
+      },
+      resize: {
+        emoji: '📐',
+        description: 'Resize and crop images easily.',
+        tag: 'RESIZE'
+      },
+      compress: {
+        emoji: '⚡',
+        description: 'Reduce image size without complicated steps.',
+        tag: 'OPTIMIZE'
+      }
+    };
+
+    const detail = toolDetails[key];
+
+    return (
+      <button
+        className="tool-card premium-tool-card"
+        key={key}
+        onClick={() => {
+          setActive(key);
+          setMobileOpen(false);
+        }}
+      >
+        <div className={`premium-tool-art ${tone}`}>
+          <span className="premium-tool-emoji">{detail?.emoji}</span>
+          <span className="premium-tool-tag">{detail?.tag}</span>
+          <Icon className="premium-tool-icon" size={30} />
+        </div>
+
+        <div className="premium-tool-content">
+          <b>{t[key]}</b>
+          <p>{detail?.description}</p>
+          <span className="premium-tool-open">
+            Open Tool <ArrowUpRight size={15} />
+          </span>
+        </div>
+      </button>
+    );
+  })}
+</section>
 
               <div className="section-title templates-title">
                 <div><span className="overline">{t.popular}</span><h2>{t.templates}</h2></div>
@@ -1167,6 +1307,13 @@ if (requiresLogin) {
           {active === 'enhance' && <PhotoEnhancer />}
           {active === 'resize' && <ResizeCrop />}
           {active === 'compress' && <ImageCompressor />}
+          {active === 'settings' && (
+  <Settings
+  user={user}
+  language={lang}
+  setLanguage={setLang}
+/>
+)}
 
           {active === 'templates' && (
             <section>
