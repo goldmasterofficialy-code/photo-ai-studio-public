@@ -5,136 +5,83 @@ const SITE_URL = 'https://www.photoai.site';
 
 const seoPages = {
   '/': {
-    title: 'PhotoAI Studio - Free AI Photo Editor & Image Tools',
+    title: 'PhotoAI Studio – Free Online AI Photo Editor & Image Tools',
     description:
-      'Edit photos online with PhotoAI Studio. Remove backgrounds, enhance photos, resize images, create posters and compress pictures with easy online tools.'
+      'PhotoAI Studio offers free online photo editing tools. Remove backgrounds, enhance photos, resize, crop and compress images with easy-to-use tools.'
   },
-
   '/generate': {
     title: 'AI Image Generator Online | PhotoAI Studio',
     description:
-      'Create images from your ideas with PhotoAI Studio. Explore creative AI image generation and bring your imagination to life.'
+      'Explore AI image generation with PhotoAI Studio and turn creative ideas into beautiful images.'
   },
-
-  '/ai-image-generator': {
-    title: 'AI Image Generator Online | PhotoAI Studio',
-    description:
-      'Create images from your ideas with PhotoAI Studio. Explore creative AI image generation and bring your imagination to life.'
-  },
-
   '/edit': {
-    title: 'AI Photo Editor Online | PhotoAI Studio',
+    title: 'Online AI Photo Editor | PhotoAI Studio',
     description:
-      'Edit and improve photos online with PhotoAI Studio. Explore simple photo editing tools for your creative projects.'
+      'Edit and improve your photos with PhotoAI Studio. Explore creative photo editing features.'
   },
-
-  '/ai-photo-editor': {
-    title: 'AI Photo Editor Online | PhotoAI Studio',
-    description:
-      'Edit and improve photos online with PhotoAI Studio. Explore simple photo editing tools for your creative projects.'
-  },
-
   '/poster': {
     title: 'Online Poster Maker | PhotoAI Studio',
     description:
-      'Create attractive posters online with PhotoAI Studio. Customize images, text and creative layouts.'
+      'Create and customize posters with PhotoAI Studio using images, text and creative layouts.'
   },
-
   '/advanced-poster': {
-    title: 'Advanced Poster Editor Online | PhotoAI Studio',
+    title: 'Advanced Poster Editor | PhotoAI Studio',
     description:
-      'Design custom posters with photos, text, stickers and creative editing options using PhotoAI Studio.'
+      'Design custom posters with photos, text, stickers and editing options.'
   },
-
   '/projects': {
-    title: 'My Photo Projects | PhotoAI Studio',
-    description: 'Manage your saved creative projects in PhotoAI Studio.',
-    robots: 'noindex, nofollow'
+    title: 'My Projects | PhotoAI Studio',
+    description: 'Manage your saved creative projects.',
+    private: true
   },
-
   '/templates': {
     title: 'Creative Photo Templates | PhotoAI Studio',
-    description:
-      'Explore creative photo templates and design ideas with PhotoAI Studio.'
+    description: 'Explore creative photo templates and design ideas.'
   },
-
   '/remove': {
-    title: 'Free Image Background Remover | PhotoAI Studio',
+    title: 'Free Background Remover Online | PhotoAI Studio',
     description:
-      'Remove image backgrounds online with PhotoAI Studio. Create transparent background images from your photos.'
+      'Remove image backgrounds online and create transparent background images with PhotoAI Studio.'
   },
-
-  '/image-background-remover': {
-    title: 'Free Image Background Remover | PhotoAI Studio',
-    description:
-      'Remove image backgrounds online with PhotoAI Studio. Create transparent background images from your photos.'
-  },
-
   '/enhance': {
-    title: 'AI Photo Enhancer Online | PhotoAI Studio',
+    title: 'Free Photo Enhancer Online | PhotoAI Studio',
     description:
-      'Enhance photos online with PhotoAI Studio. Improve brightness, sharpness and image appearance.'
+      'Improve photo brightness and sharpness with the online PhotoAI Studio photo enhancer.'
   },
-
-  '/ai-photo-enhancer': {
-    title: 'AI Photo Enhancer Online | PhotoAI Studio',
-    description:
-      'Enhance photos online with PhotoAI Studio. Improve brightness, sharpness and image appearance.'
-  },
-
   '/resize': {
-    title: 'Image Resizer and Cropper Online | PhotoAI Studio',
+    title: 'Image Resizer and Cropper | PhotoAI Studio',
     description:
-      'Resize and crop images online with PhotoAI Studio. Adjust image dimensions and aspect ratios easily.'
+      'Resize and crop images online with customizable dimensions and aspect ratios.'
   },
-
-  '/image-resizer': {
-    title: 'Image Resizer and Cropper Online | PhotoAI Studio',
-    description:
-      'Resize and crop images online with PhotoAI Studio. Adjust image dimensions and aspect ratios easily.'
-  },
-
   '/compress': {
-    title: 'Image Compressor Online | PhotoAI Studio',
+    title: 'Free Image Compressor | PhotoAI Studio',
     description:
-      'Compress JPG, PNG and WebP images online with PhotoAI Studio. Reduce image file size easily.'
+      'Compress JPG, PNG and WebP images online with PhotoAI Studio.'
   },
-
-  '/image-compressor': {
-    title: 'Image Compressor Online | PhotoAI Studio',
-    description:
-      'Compress JPG, PNG and WebP images online with PhotoAI Studio. Reduce image file size easily.'
-  },
-
   '/about': {
     title: 'About PhotoAI Studio | Online Photo Tools',
     description:
-      'Learn about PhotoAI Studio and its online photo editing, image enhancement and creative tools.'
+      'Discover PhotoAI Studio and its collection of online photo editing and image tools.'
   },
-
   '/contact': {
     title: 'Contact PhotoAI Studio | Support',
     description:
       'Contact PhotoAI Studio for questions, feedback and support.'
   },
-
   '/privacy': {
     title: 'Privacy Policy | PhotoAI Studio',
     description:
-      'Read the PhotoAI Studio privacy policy and learn how website information is handled.'
+      'Read the PhotoAI Studio privacy policy.'
   },
-
   '/terms': {
     title: 'Terms and Conditions | PhotoAI Studio',
     description:
-      'Read the terms and conditions for using PhotoAI Studio and its online tools.'
+      'Read the terms and conditions for using PhotoAI Studio.'
   },
-
   '/settings': {
     title: 'Account Settings | PhotoAI Studio',
-    description:
-      'Manage your PhotoAI Studio account preferences and settings.',
-    robots: 'noindex, nofollow'
+    description: 'Manage your account preferences.',
+    private: true
   }
 };
 
@@ -147,20 +94,13 @@ export default function SEO() {
         ? '/'
         : location.pathname.replace(/\/+$/, '');
 
-    const page = seoPages[pathname] || {
-      title: 'Page Not Found | PhotoAI Studio',
-      description: 'The requested page could not be found on PhotoAI Studio.',
-      robots: 'noindex, follow'
-    };
-
+    const page = seoPages[pathname] || seoPages['/'];
     const canonicalUrl = `${SITE_URL}${pathname === '/' ? '/' : pathname}`;
 
     document.title = page.title;
 
     function setMeta(name, content) {
-      let element = document.querySelector(
-        `meta[name="${name}"]`
-      );
+      let element = document.querySelector(`meta[name="${name}"]`);
 
       if (!element) {
         element = document.createElement('meta');
@@ -186,7 +126,7 @@ export default function SEO() {
     }
 
     setMeta('description', page.description);
-    setMeta('robots', page.robots || 'index, follow');
+    setMeta('robots', page.private ? 'noindex, follow' : 'index, follow');
 
     setProperty('og:title', page.title);
     setProperty('og:description', page.description);
@@ -198,9 +138,7 @@ export default function SEO() {
     setMeta('twitter:title', page.title);
     setMeta('twitter:description', page.description);
 
-    let canonical = document.querySelector(
-      'link[rel="canonical"]'
-    );
+    let canonical = document.querySelector('link[rel="canonical"]');
 
     if (!canonical) {
       canonical = document.createElement('link');
@@ -210,6 +148,38 @@ export default function SEO() {
 
     canonical.setAttribute('href', canonicalUrl);
 
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
+          name: 'PhotoAI Studio',
+          url: `${SITE_URL}/`
+        },
+        {
+          '@type': 'WebSite',
+          '@id': `${SITE_URL}/#website`,
+          name: 'PhotoAI Studio',
+          alternateName: 'PhotoAI',
+          url: `${SITE_URL}/`,
+          publisher: {
+            '@id': `${SITE_URL}/#organization`
+          }
+        }
+      ]
+    };
+
+    let schema = document.getElementById('photoai-structured-data');
+
+    if (!schema) {
+      schema = document.createElement('script');
+      schema.id = 'photoai-structured-data';
+      schema.type = 'application/ld+json';
+      document.head.appendChild(schema);
+    }
+
+    schema.textContent = JSON.stringify(structuredData);
   }, [location.pathname]);
 
   return null;
