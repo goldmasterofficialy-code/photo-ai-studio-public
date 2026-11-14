@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import BannerSlideshow from './BannerSlideshow.jsx';
 import {
   Aperture, WandSparkles, ImagePlus, Layers3, LayoutTemplate,
   FolderOpen, Settings2, Search, Bell, ChevronDown, Upload,
@@ -41,10 +42,46 @@ const tools = [
 ];
 
 const templateCards = [
-  { name: 'Event & Launch', tag: 'EVENT', cls: 'template-event' },
-  { name: 'Birthday Story', tag: 'CELEBRATE', cls: 'template-birthday' },
-  { name: 'Business Promo', tag: 'BRAND', cls: 'template-business' },
-  { name: 'Festival Greeting', tag: 'FESTIVAL', cls: 'template-festival' }
+  {
+    name: 'Event & Launch',
+    tag: 'EVENT',
+    cls: 'template-event',
+    images: [
+      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=900',
+      'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=900',
+      'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900'
+    ]
+  },
+  {
+    name: 'Birthday Story',
+    tag: 'CELEBRATE',
+    cls: 'template-birthday',
+    images: [
+      'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900',
+      'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=900',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=900'
+    ]
+  },
+  {
+    name: 'Business Promo',
+    tag: 'BRAND',
+    cls: 'template-business',
+    images: [
+      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=900',
+      'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=900',
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=900'
+    ]
+  },
+  {
+    name: 'Festival Greeting',
+    tag: 'FESTIVAL',
+    cls: 'template-festival',
+    images: [
+      'https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=900',
+      'https://images.unsplash.com/photo-1513883049090-d0b7439799bf?w=900',
+      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=900'
+    ]
+  }
 ];
 
 function readProjects(storageKey) {
@@ -66,6 +103,7 @@ function loadImage(src) {
 }
 
 export default function App() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
  const [lang, setLang] = useState(() => {
   try {
     const savedLang = localStorage.getItem('photo-ai-language');
@@ -252,6 +290,7 @@ useEffect(() => {
 about: 'About Us',
 contact: 'Contact Us',
 privacy: 'Privacy Policy',
+settings: 'Settings',
 terms: 'Terms & Conditions'
   }[active] || t.title;
 
@@ -593,6 +632,15 @@ if (requiresLogin) {
           <X size={18} />
         </button>
       </div>
+      <button
+  type="button"
+  className="sidebar-expand-toggle"
+  onClick={() => setSidebarCollapsed(prev => !prev)}
+  title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+  aria-label="Toggle Sidebar"
+>
+  {sidebarCollapsed ? "☰" : "‹"}
+</button>
 
       <div className="side-section-label">{t.workspace}</div>
 
@@ -647,7 +695,7 @@ if (requiresLogin) {
       ))}
 
       <div className="sidebar-bottom">
-        <div className="plan-card">
+        <div className={`plan-card ${sidebarCollapsed ? 'plan-card-hidden' : ''}`}>
           <div className="plan-icon"><Sparkles size={17} /></div>
           <b>{t.pro}</b>
           <p>Unlock your full creative potential.</p>
@@ -694,7 +742,7 @@ if (requiresLogin) {
   );
 
   return (
-    <div className="app">
+    <div className={`app ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       {sidebar}
 
       <main className="main-area">
@@ -702,6 +750,14 @@ if (requiresLogin) {
           <button className="mobile-menu" onClick={() => setMobileOpen(true)}>
             <Menu size={20} />
           </button>
+          <button
+  type="button"
+  className="sidebar-toggle"
+  onClick={() => setSidebarCollapsed(prev => !prev)}
+  title="Toggle Sidebar"
+>
+  {sidebarCollapsed ? "☰" : "☷"}
+</button>
 
           <div className="breadcrumb">
             PHOTO AI <span>/</span> {activeTitle}
@@ -805,11 +861,38 @@ if (requiresLogin) {
   </select>
 </div>
 
-            <div className="avatar top-avatar">C</div>
+            {user ? (
+  <button
+    className="top-account-button"
+    onClick={() => setActive('settings')}
+    title="Open account settings"
+  >
+    <span className="avatar top-avatar">
+      {(user.displayName || user.email || 'U')
+        .charAt(0)
+        .toUpperCase()}
+    </span>
+    <span className="top-account-label">Account</span>
+  </button>
+) : (
+  <button
+    className="top-login-button"
+    onClick={() => setActive('generate')}
+  >
+    Login / Sign up
+  </button>
+)}
           </div>
         </header>
 
         <div className="page-content">
+          {active === 'settings' && (
+  <Settings
+    user={user}
+    language={lang}
+    setLanguage={setLang}
+  />
+)}
 {['about', 'contact', 'privacy', 'terms'].includes(active) && (
   <LegalPages
     page={active}
@@ -838,17 +921,7 @@ if (requiresLogin) {
                     {t.start}<ArrowUpRight size={16} />
                   </button>
                 </div>
-                <div className="banner-art">
-                  <div className="banner-orb orb-one" />
-                  <div className="banner-orb orb-two" />
-                  <div className="floating-tile tile-one"><WandSparkles /></div>
-                  <div className="floating-tile tile-two"><ImageIcon /></div>
-                  <div className="banner-sample">
-                    <span>CREATE</span>
-                    <b>YOUR<br />VISION</b>
-                    <i>PHOTO AI STUDIO</i>
-                  </div>
-                </div>
+               <BannerSlideshow />
               </section>
 
               <div className="section-title">
@@ -856,66 +929,119 @@ if (requiresLogin) {
                 <span className="muted-caption">7 CREATIVE TOOLS</span>
               </div>
 
-              <section className="tool-grid premium-tool-grid">
+             <section className="tool-grid premium-tool-grid photo-tool-grid">
   {tools.map(({ key, icon: Icon, tone }) => {
-    const toolDetails = {
-      generate: {
-        emoji: '✨',
-        description: 'Create stunning AI images from your imagination.',
-        tag: 'AI POWERED'
-      },
-      edit: {
-        emoji: '🎨',
-        description: 'Transform and edit your photos creatively.',
-        tag: 'PHOTO EDIT'
-      },
-      poster: {
-        emoji: '🖼️',
-        description: 'Design beautiful posters in minutes.',
-        tag: 'DESIGN'
-      },
-      remove: {
-        emoji: '✂️',
-        description: 'Remove image backgrounds in one click.',
-        tag: 'INSTANT'
-      },
-      enhance: {
-        emoji: '💎',
-        description: 'Improve photo quality and clarity.',
-        tag: 'ENHANCE'
-      },
-      resize: {
-        emoji: '📐',
-        description: 'Resize and crop images easily.',
-        tag: 'RESIZE'
-      },
-      compress: {
-        emoji: '⚡',
-        description: 'Reduce image size without complicated steps.',
-        tag: 'OPTIMIZE'
-      }
-    };
+   const toolDetails = {
+  generate: {
+    emoji: '✨',
+    description: 'Create stunning AI images from your imagination.',
+    tag: 'AI POWERED',
+    images: [
+      'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=900&auto=format&fit=crop'
+    ]
+  },
+  edit: {
+    emoji: '🎨',
+    description: 'Transform and edit your photos creatively.',
+    tag: 'PHOTO EDIT',
+    images: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=900&auto=format&fit=crop'
+    ]
+  },
+  poster: {
+    emoji: '🖼️',
+    description: 'Design beautiful posters in minutes.',
+    tag: 'DESIGN',
+    images: [
+      'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1558655146-d09347e92766?w=900&auto=format&fit=crop'
+    ]
+  },
+  remove: {
+    emoji: '✂️',
+    description: 'Remove unwanted backgrounds from photos.',
+    tag: 'INSTANT',
+    images: [
+      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1468327768560-75b778cbb551?w=900&auto=format&fit=crop'
+    ]
+  },
+  enhance: {
+    emoji: '💎',
+    description: 'Improve photo quality and clarity.',
+    tag: 'ENHANCE',
+    images: [
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&auto=format&fit=crop'
+    ]
+  },
+  resize: {
+    emoji: '📐',
+    description: 'Crop and resize images to your needs.',
+    tag: 'RESIZE',
+    images: [
+      'https://images.unsplash.com/photo-1500534623283-312aade485b7?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&auto=format&fit=crop'
+    ]
+  },
+  compress: {
+    emoji: '⚡',
+    description: 'Reduce image size without complicated steps.',
+    tag: 'OPTIMIZE',
+    images: [
+      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&auto=format&fit=crop'
+    ]
+  }
+};
 
     const detail = toolDetails[key];
 
     return (
       <button
-        className="tool-card premium-tool-card"
+        className="tool-card premium-tool-card photo-tool-card"
         key={key}
         onClick={() => {
           setActive(key);
           setMobileOpen(false);
         }}
       >
-        <div className={`premium-tool-art ${tone}`}>
-          <span className="premium-tool-emoji">{detail?.emoji}</span>
-          <span className="premium-tool-tag">{detail?.tag}</span>
-          <Icon className="premium-tool-icon" size={30} />
-        </div>
+        <div className="photo-tool-image">
+  <div className="photo-tool-slides">
+    {(detail.images || []).map((src, index) => (
+      <img
+        key={`${key}-${index}`}
+        src={src}
+        alt={`${t[key]} preview ${index + 1}`}
+        className="photo-tool-slide"
+        style={{ animationDelay: `${index * 3}s` }}
+        loading="lazy"
+      />
+    ))}
+  </div>
 
-        <div className="premium-tool-content">
+  <div className="photo-tool-image-overlay" />
+
+  <span className="photo-tool-tag">{detail.tag}</span>
+  <span className="photo-tool-number">{detail.number}</span>
+
+  <span className={`photo-tool-icon ${tone}`}>
+    <Icon size={23} />
+  </span>
+</div>
+
+        <div className="premium-tool-content photo-tool-content">
           <b>{t[key]}</b>
-          <p>{detail?.description}</p>
+          <p>{detail.description}</p>
           <span className="premium-tool-open">
             Open Tool <ArrowUpRight size={15} />
           </span>
@@ -924,7 +1050,6 @@ if (requiresLogin) {
     );
   })}
 </section>
-
               <div className="section-title templates-title">
                 <div><span className="overline">{t.popular}</span><h2>{t.templates}</h2></div>
                 <button className="subtle-button" onClick={() => setActive('templates')}>
@@ -933,19 +1058,37 @@ if (requiresLogin) {
               </div>
 
               <section className="template-grid">
-                {templateCards.map((item, index) => (
-                  <button
-                    key={item.name}
-                    className={`template-tile ${item.cls}`}
-                    onClick={() => {
-                      setSelectedTemplate(index);
-                      setActive('poster');
-                    }}
-                  >
-                    <span>{item.tag}</span><b>{item.name}</b><i>PHOTO AI DESIGN</i>
-                  </button>
-                ))}
-              </section>
+  {templateCards.map((item, index) => (
+    <button
+      key={item.name}
+      className={`template-tile ${item.cls}`}
+      onClick={() => {
+        setSelectedTemplate(index);
+        setActive('poster');
+      }}
+    >
+      <div className="template-photo-slider">
+        {item.images.map((image, imageIndex) => (
+          <img
+            key={imageIndex}
+            src={image}
+            alt={`${item.name} preview ${imageIndex + 1}`}
+            className="template-slide"
+            style={{
+              animationDelay: `${imageIndex * 3}s`
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="template-card-content">
+        <span>{item.tag}</span>
+        <b>{item.name}</b>
+        <i>PHOTO AI DESIGN</i>
+      </div>
+    </button>
+  ))}
+</section>
             </>
           )}
 
@@ -1325,19 +1468,30 @@ if (requiresLogin) {
               </div>
               <div className="template-grid large">
                 {templateCards.map((item, index) => (
-                  <button
-                    key={item.name}
-                    className={`template-tile ${item.cls}`}
-                    onClick={() => {
-                      setSelectedTemplate(index);
-                      setActive('poster');
-                    }}
-                  >
-                    <span>{item.tag}</span>
-                    <b>{item.name}</b>
-                    <i>PHOTO AI DESIGN</i>
-                  </button>
-                ))}
+  <button
+    key={item.name}
+    className={`template-tile ${item.cls}`}
+    onClick={() => {
+      setSelectedTemplate(index);
+      setActive('poster');
+    }}
+  >
+    <img
+      className="template-photo"
+      src={item.image}
+      alt={item.name}
+      loading="lazy"
+    />
+
+    <span className="template-overlay"></span>
+
+    <span className="template-content">
+      <span className="template-tag">{item.tag}</span>
+      <b>{item.name}</b>
+      <i>PHOTO AI DESIGN</i>
+    </span>
+  </button>
+))}
               </div>
             </section>
           )}
