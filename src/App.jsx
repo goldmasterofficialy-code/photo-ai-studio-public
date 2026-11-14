@@ -693,7 +693,27 @@ if (requiresLogin) {
           {t[key]}
         </button>
       ))}
+<div className={`sidebar-language ${sidebarCollapsed ? 'sidebar-language-collapsed' : ''}`}>
+  <div className="sidebar-language-title">
+    <Languages size={17} />
+    {!sidebarCollapsed && <span>Language</span>}
+  </div>
 
+  {!sidebarCollapsed && (
+    <select
+      className="sidebar-language-select"
+      value={lang}
+      onChange={(event) => setLang(event.target.value)}
+      aria-label="Select language"
+    >
+      {LANGUAGES.map((language) => (
+        <option key={language.code} value={language.code}>
+          {language.name}
+        </option>
+      ))}
+    </select>
+  )}
+</div>
       <div className="sidebar-bottom">
         <div className={`plan-card ${sidebarCollapsed ? 'plan-card-hidden' : ''}`}>
           <div className="plan-icon"><Sparkles size={17} /></div>
@@ -843,24 +863,6 @@ if (requiresLogin) {
             <button className="icon-button" aria-label="Notifications">
               <Bell size={18} />
             </button>
-
-           <div className="language-selector">
-  <Languages size={16} />
-
-  <select
-    className="language-select"
-    value={lang}
-    onChange={(event) => setLang(event.target.value)}
-    aria-label="Select language"
-  >
-    {LANGUAGES.map((language) => (
-      <option key={language.code} value={language.code}>
-        {language.name}
-      </option>
-    ))}
-  </select>
-</div>
-
             {user ? (
   <button
     className="top-account-button"
