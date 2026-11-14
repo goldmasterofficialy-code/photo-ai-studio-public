@@ -165,6 +165,23 @@ useEffect(() => {
   setActiveState(page);
 }, [location.pathname]);
 useEffect(() => {
+  const path = location.pathname.endsWith('/')
+    ? location.pathname
+    : `${location.pathname}/`;
+
+  const canonicalUrl = `https://www.photoai.site${path}`;
+
+  let canonical = document.querySelector('link[rel="canonical"]');
+
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonical);
+  }
+
+  canonical.setAttribute('href', canonicalUrl);
+}, [location.pathname]);
+useEffect(() => {
   const unsubscribe = onAuthStateChanged(
     auth,
     (firebaseUser) => {
