@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BannerSlideshow from './BannerSlideshow.jsx';
+import SEO from './SEO.jsx';
 import {
   Aperture, WandSparkles, ImagePlus, Layers3, LayoutTemplate,
   FolderOpen, Settings2, Search, Bell, ChevronDown, Upload,
@@ -780,6 +781,7 @@ if (requiresLogin) {
 
   return (
     <div className={`app ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+     <SEO />
       {sidebar}
 
       <main className="main-area">
